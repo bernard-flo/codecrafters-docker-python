@@ -22,7 +22,10 @@ def main() -> None:
     with tempfile.TemporaryDirectory() as temp_dir:
         os.makedirs(newroot_path(os.path.dirname(command), temp_dir))
         shutil.copy(command, newroot_path(command, temp_dir))
-        completed_process = subprocess.run(["chroot", temp_dir, command, *args], capture_output=True)
+        completed_process = subprocess.run(
+            ["unshare", "--map-root-user", "--fork", "--pid", "chroot", temp_dir, command, *args],
+            capture_output=True,
+        )
 
     sys.stdout.buffer.write(completed_process.stdout)
     sys.stderr.buffer.write(completed_process.stderr)
